@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <meta charset="UTF-8">
+    <title>Event Manage</title>
+</head>
+<body role="document">
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-sm">
+        <div class="container-fluid" style="background-color: antiquewhite">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/event_manage/" style="background-color: chartreuse">Guest Manage System</a>
+            </div>
+            <div id="navbar-head" class="collapsed" style="background-color: aliceblue">
+                <ul class="nav navbar-nav" style="background-color: blueviolet">
+                    <li class="active"><a href="#" style="background-color: chocolate">发布会</a> </li>
+                    <li><a href="/guest_manage/" style="background-color: darkgreen">嘉宾</a> </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#" style="background-color: chocolate">{{ user }}</a> </li>
+                    <li><a href="/logout/">退出</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- 发布会搜索表单 -->
+    <div class="page-header" style="padding-top: 60px;padding-left: 20px">
+        <div id="navbar-search" class="navbar-collapse collapsed">
+            <form class="navbar-form" method="get" action="/search_name/">
+                <div>
+                    <label for="name">名称：</label>
+                    <input id="name" name="name" type="text"/>
+                    <button id="search_event" type="submit" class="button">搜索</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- 发布会列表 -->
+    <div class="row2" style="padding-top: 80px;background-color: aliceblue;">
+        <div class="col">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>id</th><th>名称</th><th>状态</th><th>地址</th><th>时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                        <tr>
+                            <td>{{ event.id }}</td>
+                            <td>{{ event.name }}</td>
+                            <td>{{ event.status }}</td>
+                            <td>{{ event.address }}</td>
+                            <td>{{ event.start_time }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
