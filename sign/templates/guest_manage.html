@@ -9,38 +9,40 @@
 </head>
 <body role="document">
     <!-- 导航栏 -->
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
+    <nav class="navbar navbar-expand-sm">
+        <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand" href="/event_manage/">Guest Manage System</a>
             </div>
-            <div id="navbar-head" class="c">
-                <ul class="nav navbar-nav">
+            <div id="navbar-head" class="collapsed">
+                <ul class="nav navbar-nav navbar-left">
                     <li><a href="/event_manage/">发布会</a> </li>
                     <li class="active"><a href="#">嘉宾</a> </li>
                 </ul>
+            </div>
+            <div id="navbar-userinfo" class="collapsed">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">{{ user }}</a></li>
+                    <li><a href="#">{{ user }}</a> </li>
                     <li><a href="/logout/">退出</a></li>
                 </ul>
             </div>
         </div>
     </nav>
     <!-- 嘉宾搜索表单 -->
-    <div class="page-header" style="padding-top: 60px">
+    <div class="page-header" style="padding-top: 60px;padding-left: 20px">
         <div id="navbar-search" class="navbar-collapse collapsed">
             <form class="navbar-form" method="get" action="/search_name/">
-                <div class="form-group">
+                <div>
                     <label for="realname">姓名：</label>
-                    <input id="realname" type="text" class="form-control"/>
+                    <input id="realname" type="text"/>
+                    <button id="search_guest" type="submit" class="button">搜索</button>
                 </div>
-                <button id="search_guest" type="submit" class="btn btn-success">搜索</button>
             </form>
         </div>
     </div>
     <!-- 嘉宾列表 -->
     <div class="row1" style="padding-top: 80px">
-        <div class="col-md-6">
+        <div class="col">
             <table class="table table-striped">
                 <thead>
                 <tr>
