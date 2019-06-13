@@ -27,4 +27,6 @@ urlpatterns = [
     path('guest_manage/', views.guest_manage),
     path('search_name/', views.search_name),
     path('search_realname/', views.search_realname),
+    re_path('^sign_index/(?P<eid>[0-9]+)/$', views.sign_index),
+    re_path('^sign_index_action/(?P<eid>[0-9]+)/$', views.sign_index_action)
 ]

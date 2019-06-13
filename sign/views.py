@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from django.http import HttpResponse,HttpResponseRedirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -29,7 +29,7 @@ def login_action(request):
 def event_manage(request):
     username = request.session.get('user', '')  # 读取浏览器session
     event_list = Event.objects.all()
-    return render(request, "event_manage.html", {'user':username, 'events':event_list})
+    return render(request, "event_manage.html", {'user': username, 'events': event_list})
 
 # 发布会名称搜索
 @login_required
@@ -37,7 +37,7 @@ def search_name(request):
     username = request.session.get('user', '')
     search_name = request.GET.get('name', '')
     event_list = Event.objects.filter(name__contains=search_name)
-    return render(request, "event_manage.html", {'user':username, 'events':event_list})
+    return render(request, "event_manage.html", {'user': username, 'events': event_list})
 
 # 嘉宾管理
 @login_required
@@ -52,7 +52,7 @@ def guest_manage(request):
         contacts = paginator.page(1)        # 显示第1页的数据
     except EmptyPage:                       # 如果超出页数范围，抛出Empty异常
         contacts = paginator.page(paginator.num_pages)      # 显示最后一页的数据
-    return render(request, "guest_manage.html", {'user':username, 'guests':contacts})
+    return render(request, "guest_manage.html", {'user': username, 'guests': contacts})
 
 # 嘉宾搜索
 @login_required
@@ -69,3 +69,28 @@ def search_realname(request):
     except EmptyPage:  # 如果超出页数范围，抛出Empty异常
         contacts = paginator.page(paginator.num_pages)  # 显示最后一页的数据
     return render(request, "guest_manage.html", {'user': username, 'guests': contacts})
+
+# 签到页面
+@login_required
+def sign_index(request, eid):
+    event = get_object_or_404(Event, id=eid)
+    return render(request, "sign_index.html", {'event': event})
+
+# 签到动作
+@login_required
+def sign_index_action(request, eid):
+    event = get_object_or_404(Event, id=eid)
+    phone = request.POST.get('phone', '')
+    print (phone)
+    result = Guest.objects.filter(phone=phone)
+    if not result:
+        return render(request, "sign_index.html", {'event': event, 'hint': 'phone error'})
+    result = Guest.objects.filter(phone=phone, event_id=eid)
+    if not result:
+        return render(request, "sign_index.html", {'event': event, 'hint': "phone doesn't exist in this event"})
+    result = Guest.objects.get(phone=phone, event_id=eid)
+    if result.sign:
+        return render(request, 'sign_index.html', {'event': event, 'hint': 'user has sign in'})
+    else:
+        Guest.objects.filter(phone=phone, event_id=eid).update(sign='1')
+        return render(request, 'sign_index.html', {'event': event, 'hint': 'sign in success', 'guest': result})
