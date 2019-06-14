@@ -27,6 +27,7 @@
     <!-- 签到功能 -->
     <div class="page-header" style="padding-top: 80px;">
         <div id="navbar" class="navbar navbar-collapse">
+            <h1>发布会嘉宾总数：{{ guest_num }},已签到：{{ signin_num }}</h1>
             <form class="navbar-form" method="post" action="/sign_index_action/{{ event.id }}/">
                 <div class="form-group">
                     <label for="phone">手机号：</label>
@@ -36,6 +37,7 @@
                 <br>{{ hint }}
                 <br>{{ guest.realname }}
                 <br>{{ guest.phone }}
+                {% csrf_token %}
             </form>
         </div>
     </div>
