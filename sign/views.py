@@ -94,7 +94,7 @@ def sign_index_action(request, eid):
                                                    'signin_num': signin_num['signin_num']})
     result = Guest.objects.filter(phone=phone, event_id=eid)    # 查询phone与event是否匹配，不存在提示phone与event不匹配
     if not result:
-        return render(request, "sign_index.html", {'event': event, 'hint': "phone and event doesn't match",
+        return render(request, "sign_index.html", {'event': event, 'hint': 'phone and event not match',
                                                    'guest_num': guest_num['guest_num'],
                                                    'signin_num': signin_num['signin_num']})
     result = Guest.objects.get(phone=phone, event_id=eid)   # 获取phone和eid的嘉宾对象，判断其是否签到
