@@ -1,6 +1,8 @@
 from django.http import JsonResponse
 from sign.models import Event, Guest
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.db.utils import IntegrityError
+import time
 
 
 # 添加发布会接口
@@ -29,10 +31,11 @@ def add_event(request):
     try:
         Event.objects.create(id=eid, name=name, limit=limit, status=int(status), address=address,
                              start_time=start_time)
-    except ValidationError as e:
+    except ValidationError:
         error = 'start_time format error. It must be in YYYY-MM-DD HH:MM:SS format.'
         return JsonResponse({'status': 100024, 'message': error})
     return JsonResponse({'status': 200, 'message': 'add event success'})
+
 
 # 查询发布会接口
 def get_event_list(request):
@@ -47,7 +50,7 @@ def get_event_list(request):
         event = {}
         try:
             result = Event.objects.get(id=eid)
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             return JsonResponse({'status': 100022, 'message': 'query result is empty'})
         else:
             event['name'] = result.name
@@ -55,19 +58,62 @@ def get_event_list(request):
             event['status'] = result.status
             event['address'] = result.address
             event['start_time'] = result.start_time
-            return JsonResponse({'status': 200, 'message': 'success', 'data':event})
+            return JsonResponse({'status': 200, 'message': 'success', 'data': event})
     if name != '':
         datas = []
         results = Event.objects.filter(name__contains=name)
         if results:
             for r in results:
-                event = {}
+                event = dict()
                 event['name'] = r.name
                 event['limit'] = r.limit
                 event['status'] = r.status
                 event['address'] = r.address
                 event['start_time'] = r.start_time
                 datas.append(event)
-            return JsonResponse({'status': 200, 'message': 'success', 'data':datas})
+            return JsonResponse({'status': 200, 'message': 'success', 'data': datas})
         else:
             return JsonResponse({'status': 100022, 'message': 'query result is empty'})
+
+
+# 添加嘉宾接口
+def add_guest(request):
+    eid = request.POST.get('eid', '')
+    realname = request.POST.get('realname', '')
+    phone = request.POST.get('phone', '')
+    email = request.POST.get('email', '')
+
+    # 若eid，realname，phone为空，则提示参数错误
+    if eid == '' or realname == '' or phone == '':
+        return JsonResponse({'status': 100021, 'message': 'parameter error'})
+    # 判断发布会是否存在,不存在返回发布会id不存在
+    result = Event.objects.filter(id=eid)
+    if not result:
+        return JsonResponse({'status': 100022, 'message': 'event id null'})
+    # 判断发布会状态是否为True，不为True，说明发布会为关闭状态
+    result = Event.objects.get(id=eid).status
+    if not result:
+        return JsonResponse({'status': 100023, 'message': 'event status is not available'})
+    # 判断发布会嘉宾数量是否已达到上限
+    event_limit = Event.objects.get(id=eid).limit               # 发布会人数上限
+    guest_num = len(Guest.objects.filter(event_id=eid))         # 发布会已添加的人数
+    if guest_num >= event_limit:
+        return JsonResponse({'status': 100024, 'message': 'event limit is full'})
+    # 判断发布会是否已开始
+    event_time = Event.objects.get(id=eid).start_time           # 发布会时间
+    etime = str(event_time).split(".")[0]
+    timearray = time.strptime(etime, "%Y-%M-%D %H:%M:%S")
+    e_time = int(time.mktime(timearray))
+
+    now_time = str(time.time())                                 # 当前时间
+    ntime = now_time.split(".")[0]
+    n_time = int(ntime)
+
+    if n_time >= e_time:
+        return JsonResponse({'status': 100025, 'message': 'event has started'})
+    # 插入嘉宾数据，若phone存在，则抛出IntegrityError异常，并返回状态码和信息，插入成功返回状态码200
+    try:
+        Guest.objects.create(realname=realname, phone=phone, email=email, sign=0, event_id=eid)
+    except IntegrityError:
+        return JsonResponse({'status': 100026, 'message': 'the event guest phone number repeat'})
+    return JsonResponse({'status': 200, 'message': 'add guest success'})
