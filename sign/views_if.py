@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from sign.models import Event, Guest
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db.utils import IntegrityError
@@ -6,6 +7,7 @@ import time
 
 
 # 添加发布会接口
+@csrf_exempt    # django 的POST接口需要CSRF验证，添加此装饰器豁免验证
 def add_event(request):
     eid = request.POST.get('eid', '')                           # 发布会id
     name = request.POST.get('name', '')                         # 发布会名称
@@ -77,6 +79,7 @@ def get_event_list(request):
 
 
 # 添加嘉宾接口
+@csrf_exempt
 def add_guest(request):
     eid = request.POST.get('eid', '')
     realname = request.POST.get('realname', '')
@@ -158,6 +161,7 @@ def get_guest_list(request):
 
 
 # 发布会签到接口
+@csrf_exempt
 def user_sign(request):
     eid = request.POST.get('eid', '')                   # 发布会id
     phone = request.POST.get('phone', '')               # 嘉宾手机号
