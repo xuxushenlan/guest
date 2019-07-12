@@ -21,7 +21,7 @@ def user_auth(request):
     except IndexError: # 获取不到Auth数据，抛出异常
         return "null"
     # 取出auth_parts元组中对应的username和password
-    username, password = auth_parts[0], auth_parts[1]
+    username, password = auth_parts[0], auth_parts[2]
     # 调用Django的认证模块，认证成功则返回"success",失败返回"fail"
     user = django_auth.authenticate(username=username, password=password)
     if user is not None:
